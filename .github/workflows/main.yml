@@ -1,0 +1,13 @@
+name: Sync Docker Hub README
+run-name: ${{ github.actor }} is learning GitHub Actions
+on: [push]
+jobs:
+  check-bats-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Docker Hub Description
+        uses: peter-evans/dockerhub-description@v3.1.2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          repository: crossrt/jenkins-k8s-tools
