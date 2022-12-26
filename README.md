@@ -18,3 +18,51 @@ And then I need to commit what have been changed with a human readable message, 
 ```
 docker run --rm -it --entrypoint sh crossrt/jenkins-k8s-tools
 ```
+
+## Jenkinsfile example
+```
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Build') {
+            // build your project
+        }
+        
+        stage('Update manifest') {
+            // use the image for this stage
+            agent {
+                docker {
+                    image 'crossrt/jenkins-k8s-tools:latest'
+                }
+            }
+            
+            steps {
+                // pull your deployment repo
+                git credentialsId: 'jenkins-server-ssh', poll: false, url: "$DEPLOYMENT_REPO_URI", branch: "$DEPLOYMENT_REPO_BRANCH"
+
+                // change directory to locate the kustomization.yaml
+                dir("base") {
+                    // `kustomize` will be available here
+                    sh 'kustomize edit set image $IMAGE_TAG:$GIT_COMMIT'
+                }
+
+                // after you update kustomization.yaml, you will need to push it back to your repository
+                // so here we passing the SSH key into the container through ssh-agent.
+                sshagent (credentials: ['jenkins-server-ssh']) {
+                    // do what every git stuff here you want
+                    sh 'git config user.email "jenkins@example.com"'
+                    sh 'git config user.name "Jenkins"'
+                    sh 'git branch --set-upstream-to origin/$DEPLOYMENT_REPO_BRANCH'
+                    sh 'git config --global core.sshCommand "ssh -o StrictHostKeyChecking=accept-new"'
+
+                    // lastly, commit and push your deployment repo
+                    sh 'git commit -am "$REPO_NAME updated: $GIT_COMMIT" && git push || echo "no changes"'
+                }
+            }
+        }
+    }
+}
+
+```
