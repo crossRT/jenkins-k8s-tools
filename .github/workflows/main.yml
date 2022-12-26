@@ -1,12 +1,20 @@
 name: Sync Docker Hub README
 run-name: ${{ github.actor }} is learning GitHub Actions
-on: [push]
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - README.md
+      - .github/workflows/main.yml
 jobs:
-  sync-docker-hub-readme:
+  dockerHubDescription:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+      
       - name: Docker Hub Description
-        uses: peter-evans/dockerhub-description@v3.1.2
+        uses: peter-evans/dockerhub-description@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
