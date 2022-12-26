@@ -1,5 +1,5 @@
 name: Sync Docker Hub README
-run-name: ${{ github.actor }} is learning GitHub Actions
+run-name: Syncing Docker Hub README
 on:
   push:
     branches:
