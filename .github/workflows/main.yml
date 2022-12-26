@@ -2,7 +2,7 @@ name: Sync Docker Hub README
 run-name: ${{ github.actor }} is learning GitHub Actions
 on: [push]
 jobs:
-  check-bats-version:
+  sync-docker-hub-readme:
     runs-on: ubuntu-latest
     steps:
       - name: Docker Hub Description
